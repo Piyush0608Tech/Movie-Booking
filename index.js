@@ -1,25 +1,21 @@
 let totalBookings = 0;
 let bookedSeats = []; 
-
 const form = document.getElementById('myform');
 form.addEventListener('submit', function(event) {
     event.preventDefault(); 
     const username = document.getElementById('username').value;
     const seatNumber = parseInt(document.getElementById('seatNumber').value);
-    if (bookedSeats.some(user => user.seatNumber === seatNumber)) {
-        alert('Seat is already booked.');
+    if (bookedSeats.some(user =>user.seatNumber === seatNumber)) {
         return; 
     }
     const userDetails = {
         username,
         seatNumber,
     };
-    axios.post("https://crudcrud.com/api/35152cba16f04f62ac0dc5d087d27344/PiyushMovie", userDetails)
+axios.post("https://crudcrud.com/api/6fc1c621de5749bf9a12bb714cbe277a/PiyushMovie", userDetails)
         .then((response) => {
-            console.log(response);
             totalBookings++; 
             updateTotalBookingsCount(); 
-            alert('Booked');
             show(response.data);
             bookedSeats.push(userDetails); 
         })
@@ -27,9 +23,8 @@ form.addEventListener('submit', function(event) {
             console.log(err);
         });
 });
-axios.get("https://crudcrud.com/api/35152cba16f04f62ac0dc5d087d27344/PiyushMovie")
+axios.get("https://crudcrud.com/api/6fc1c621de5749bf9a12bb714cbe277a/PiyushMovie")
     .then((response) => {
-        console.log(response);
         totalBookings = response.data.length; 
         updateTotalBookingsCount(); 
         bookedSeats = response.data;
@@ -43,21 +38,15 @@ axios.get("https://crudcrud.com/api/35152cba16f04f62ac0dc5d087d27344/PiyushMovie
 function show(userDetails) {
     const userList = document.getElementById("userList");
     const list = document.createElement("li");
-    list.textContent = userDetails.username + ' - ' + userDetails.seatNumber;
-
+    list.textContent = userDetails.username + '-' + userDetails.seatNumber;
     const del = document.createElement("button");
     del.textContent = "Delete";
     del.onclick = () => {
-        axios.delete(`https://crudcrud.com/api/35152cba16f04f62ac0dc5d087d27344/PiyushMovie/${userDetails._id}`)
+        axios.delete(`https://crudcrud.com/api/6fc1c621de5749bf9a12bb714cbe277a/PiyushMovie/${userDetails._id}`)
             .then((response) => {
-                console.log(response);
                 userList.removeChild(list);
                 totalBookings--; 
                 updateTotalBookingsCount(); 
-                const index = bookedSeats.findIndex(user => user._id === userDetails._id);
-                if (index !== -1) {
-                    bookedSeats.splice(index, 1); 
-                }
             })
             .catch((err) => {
                 console.log(err);
@@ -66,22 +55,18 @@ function show(userDetails) {
     const edit = document.createElement("button");
     edit.textContent = "Edit";
     edit.onclick = () => {
-        axios.delete(`https://crudcrud.com/api/35152cba16f04f62ac0dc5d087d27344/PiyushMovie/${userDetails._id}`)
+        axios.delete(`https://crudcrud.com/api/6fc1c621de5749bf9a12bb714cbe277a/PiyushMovie/${userDetails._id}`)
             .then((response) => {
-                console.log(response);
                 userList.removeChild(list);
+                totalBookings--; 
+                updateTotalBookingsCount(); 
                 document.getElementById("username").value = userDetails.username;
                 document.getElementById("seatNumber").value = userDetails.seatNumber;
-                const index = bookedSeats.findIndex(user => user._id === userDetails._id);
-                if (index !== -1) {
-                    bookedSeats.splice(index, 1); 
-                }
             })
             .catch((err) => {
                 console.log(err);
             });
     };
-
     list.appendChild(del);
     list.appendChild(edit);
     userList.appendChild(list);
@@ -90,22 +75,17 @@ function updateTotalBookingsCount() {
     const totalBookingsElement = document.getElementById("totalBookings");
     totalBookingsElement.textContent = `Total Bookings: ${totalBookings}`;
 }
-
 const filter = document.getElementById("filter");
 filter.addEventListener("keyup", function(event) {
-    const textEntered = event.target.value.trim(); 
+    const textEntered = event.target.value; 
     const userList = document.getElementById("userList");
     for (let i = 0; i < userList.children.length; i++) {
-        const seatNumber = parseInt(userList.children[i].textContent.split('-')[1].trim()); 
-        if (textEntered === "") { 
-            userList.children[i].style.display = "block"; 
-        } else {
+        const seatNumber = parseInt(userList.children[i].textContent.split('-')[1]);
             if (seatNumber !== parseInt(textEntered)) { 
                 userList.children[i].style.display = "none";
             } else {
                 userList.children[i].style.display = "block";
             }
-        }
     }
 });
 
